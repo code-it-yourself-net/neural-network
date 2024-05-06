@@ -49,7 +49,7 @@ internal class Matrix
 
     internal static Matrix Random(int rows, int columns, Random random)
     {
-        // create an instance of Array of floats using rows and columns and fill it with randoms
+        // Create an instance of Array of floats using rows and columns and fill it with randoms.
         Array array = Array.CreateInstance(typeof(float), rows, columns);
         for (int i = 0; i < rows; i++)
         {
@@ -248,9 +248,6 @@ internal class Matrix
 
     internal Matrix Transpose()
     {
-        // create a new MyArray instance with the columns and rows swapped
-
-        // get the number of rows of _array
         int rows = _array.GetLength(0);
         int columns = _array.GetLength(1);
 
