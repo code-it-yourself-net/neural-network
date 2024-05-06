@@ -1,12 +1,15 @@
-﻿// Project: DIY Neural Network
+﻿// Machine Learning
 // File name: Program.cs
-// Created by: dotnet.org.pl 2024
+// Code It Yourself with .NET, 2024
 
 using System.Diagnostics;
 
-// main method
-Matrix xTrain = new(new float[,] { { 1, 2 }, { 2, 3 }, { 3, 4 }, { 4, 5 }, { 5, 6 }, { 0, 0 }, { -5, -6 } });
+using MachineLearning.Utils;
 
+// main method
+
+Console.WriteLine("Linear function");
+Matrix xTrain = new(new float[,] { { 1, 2 }, { 2, 3 }, { 3, 4 }, { 4, 5 }, { 5, 6 }, { 0, 0 }, { -5, -6 } });
 Matrix yTrain = new(new float[,] { { -3 }, { -5 }, { -7 }, { -9 }, { -11 }, { 0 }, { 11 } });
 
 (Matrix weights, float bias, float loss) = Train(xTrain, yTrain, iterations: 1_500, learningRate: 0.01f, batchSize: 100);
@@ -81,9 +84,9 @@ static (Matrix xPermuted, Matrix yPermuted) PermuteData(Matrix x, Matrix y, Rand
 
     int[] indices = [.. Enumerable.Range(0, x.GetDimension(Dimension.Rows)).OrderBy(i => random.Next())];
 
-    Matrix xPermuted = Matrix.Zeros(x.GetDimension(Dimension.Rows), x.GetDimension(Dimension.Columns));
+    Matrix xPermuted = Matrix.Zeros(x);
 
-    Matrix yPermuted = Matrix.Zeros(y.GetDimension(Dimension.Rows), y.GetDimension(Dimension.Columns));
+    Matrix yPermuted = Matrix.Zeros(y);
 
     for (int i = 0; i < x.GetDimension(Dimension.Rows); i++)
     {
@@ -106,7 +109,6 @@ static (Matrix weights, float bias, float loss) Train(Matrix xTrain, Matrix yTra
         random = new();
 
     Matrix weights = Matrix.Random(xTrain.GetDimension(Dimension.Columns), 1, random);
-    // MyArray weights = MyArray.Ones(xTrain.GetDimension(Dimension.Columns), 1);
     float bias = random.NextSingle() - 0.5f;
 
     (xTrain, yTrain) = PermuteData(xTrain, yTrain, random);
