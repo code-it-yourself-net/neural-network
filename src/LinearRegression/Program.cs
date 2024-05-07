@@ -2,6 +2,9 @@
 // File name: Program.cs
 // Code It Yourself with .NET, 2024
 
+// Based on the code from Deep Learning from Scratch: Building with Python from First Principles by Seth Weidman
+// https://github.com/SethHWeidman/DLFS_code/blob/master/02_fundamentals/Code.ipynb
+
 using System.Diagnostics;
 
 using MachineLearning.Utils;
@@ -9,13 +12,14 @@ using MachineLearning.Utils;
 // main method
 
 Console.WriteLine("Linear function");
-Matrix xTrain = new(new float[,] { { 1, 2 }, { 2, 3 }, { 3, 4 }, { 4, 5 }, { 5, 6 }, { 0, 0 }, { -5, -6 } });
-Matrix yTrain = new(new float[,] { { -3 }, { -5 }, { -7 }, { -9 }, { -11 }, { 0 }, { 11 } });
+Matrix xTrain = new(new float[,] { { 10, 20 }, { 2, 3 }, { 3, 4 }, { 4, 5 }, { 5, 6 }, { 0, 0 }, { -5, -6 }, { -100f, 2f } });
+Matrix yTrain = new(new float[,] { { -30 }, { -5 }, { -7 }, { -9 }, { -11 }, { 0 }, { 11 }, { 98f } });
 
-(Matrix weights, float bias, float loss) = Train(xTrain, yTrain, iterations: 1_500, learningRate: 0.01f, batchSize: 100);
+(Matrix weights, float bias, float loss) = Train(xTrain, yTrain, iterations: 1_500, learningRate: 0.00001f, batchSize: 10);
 
 Console.WriteLine();
-Console.WriteLine($"weights: {weights.Array.GetValue(0, 0)},  {weights.Array.GetValue(1, 0)}");
+// Console.WriteLine($"weights: {weights.Array.GetValue(0, 0)},  {weights.Array.GetValue(1, 0)}");
+Console.WriteLine($"weights: \n{weights}");
 Console.WriteLine($"bias: {bias}");
 Console.WriteLine($"loss: {loss}");
 Console.WriteLine();
@@ -31,7 +35,7 @@ Console.ReadLine();
 
 // Functions
 
-static (Matrix xBatch, Matrix yBatch, Matrix n, Matrix p, float loss) ForwardLinearRegression(Matrix xBatch, Matrix yBatch, Matrix weights, float bias)
+static (Matrix n, Matrix p, float loss) ForwardLinearRegression(Matrix xBatch, Matrix yBatch, Matrix weights, float bias)
 {
     Debug.Assert(xBatch.GetDimension(Dimension.Rows) == yBatch.GetDimension(Dimension.Rows));
 
@@ -46,9 +50,10 @@ static (Matrix xBatch, Matrix yBatch, Matrix n, Matrix p, float loss) ForwardLin
     // Calculate the mean squared error loss.
     float loss = yBatch.Subtract(p).Power(2).Mean();
 
-    return (xBatch, yBatch, n, p, loss);
+    return (n, p, loss);
 }
 
+// bias is not used here, because it's a scalar (so we don't need to know any dimensions) and its derivative is just equal to 1
 static (Matrix weightsLossGradient, float biasLossGradient) LossGradients(Matrix xBatch, Matrix yBatch, Matrix weights, float bias, Matrix n, Matrix p)
 {
     int batchSize = xBatch.GetDimension(Dimension.Rows);
@@ -99,7 +104,7 @@ static (Matrix xPermuted, Matrix yPermuted) PermuteData(Matrix x, Matrix y, Rand
     return (xPermuted, yPermuted);
 }
 
-static (Matrix weights, float bias, float loss) Train(Matrix xTrain, Matrix yTrain, int iterations = 2_000, float learningRate = 0.01f, int? seed = null, int batchSize = 100)
+static (Matrix weights, float bias, float loss) Train(Matrix xTrain, Matrix yTrain, int iterations = 200, float learningRate = 0.01f, int? seed = null, int batchSize = 100)
 {
     float loss = 0;
     Random random;
@@ -111,9 +116,7 @@ static (Matrix weights, float bias, float loss) Train(Matrix xTrain, Matrix yTra
     Matrix weights = Matrix.Random(xTrain.GetDimension(Dimension.Columns), 1, random);
     float bias = random.NextSingle() - 0.5f;
 
-    (xTrain, yTrain) = PermuteData(xTrain, yTrain, random);
-
-    int batchStart = 0;
+    int batchStart = int.MaxValue;
 
     int xTrainRows = xTrain.GetDimension(Dimension.Rows);
 
@@ -126,12 +129,13 @@ static (Matrix weights, float bias, float loss) Train(Matrix xTrain, Matrix yTra
         }
 
         int effectiveBatchSize = Math.Min(batchSize, xTrainRows - batchStart);
-        Matrix xBatch = xTrain.GetRows(batchStart..effectiveBatchSize);
-        Matrix yBatch = yTrain.GetRows(batchStart..effectiveBatchSize);
+        int batchEnd = effectiveBatchSize + batchStart;
+        Matrix xBatch = xTrain.GetRows(batchStart..batchEnd);
+        Matrix yBatch = yTrain.GetRows(batchStart..batchEnd);
 
         batchStart += effectiveBatchSize;
 
-        (xBatch, yBatch, Matrix n, Matrix p, loss) = ForwardLinearRegression(xBatch, yBatch, weights, bias);
+        (Matrix n, Matrix p, loss) = ForwardLinearRegression(xBatch, yBatch, weights, bias);
 
         // Print loss every 100 steps
         if (i % 100 == 0)
