@@ -7,7 +7,7 @@
 
 using System.Diagnostics;
 
-using MachineLearning.Utils;
+using MachineLearning;
 
 // main method
 
@@ -18,7 +18,6 @@ Matrix yTrain = new(new float[,] { { -30 }, { -5 }, { -7 }, { -9 }, { -11 }, { 0
 (Matrix weights, float bias, float loss) = Train(xTrain, yTrain, iterations: 1_500, learningRate: 0.00001f, batchSize: 10);
 
 Console.WriteLine();
-// Console.WriteLine($"weights: {weights.Array.GetValue(0, 0)},  {weights.Array.GetValue(1, 0)}");
 Console.WriteLine($"weights: \n{weights}");
 Console.WriteLine($"bias: {bias}");
 Console.WriteLine($"loss: {loss}");
@@ -90,7 +89,6 @@ static (Matrix xPermuted, Matrix yPermuted) PermuteData(Matrix x, Matrix y, Rand
     int[] indices = [.. Enumerable.Range(0, x.GetDimension(Dimension.Rows)).OrderBy(i => random.Next())];
 
     Matrix xPermuted = Matrix.Zeros(x);
-
     Matrix yPermuted = Matrix.Zeros(y);
 
     for (int i = 0; i < x.GetDimension(Dimension.Rows); i++)
@@ -115,6 +113,10 @@ static (Matrix weights, float bias, float loss) Train(Matrix xTrain, Matrix yTra
 
     Matrix weights = Matrix.Random(xTrain.GetDimension(Dimension.Columns), 1, random);
     float bias = random.NextSingle() - 0.5f;
+
+    // Uncomment for tests:
+    // Matrix weights = new(new float[2, 1] { { -1f }, { 1f } });
+    // float bias = 0;
 
     int batchStart = int.MaxValue;
 

@@ -7,7 +7,7 @@
 
 using System.Diagnostics;
 
-using MachineLearning.Utils;
+using MachineLearning;
 
 // main method
 
@@ -15,7 +15,7 @@ Console.WriteLine("Linear function");
 Matrix xTrain = new(new float[,] { { 1, 2 }, { 2, 3 }, { 3, 4 }, { 4, 5 }, { 5, 6 }, { 0, 0 }, { -2, -6 }, { -3, -2 }, { 1, 6 }, { -3, 0 }, { 3, 0 }, { -2, 0 }, { -2.5f, 1 }, { -4, 5 }, {-5, 7 }, { -1, 3 }, { -3, 1 } });
 // y = x1 + x2 + 0
 // Matrix yTrain = new(new float[,] { { -3 }, { -5 }, { -7 }, { -9 }, { -11 }, { 0 }, { 11 }, { 9.8f } });
-// y = 2*x1^2 - 6*x + 4.5
+// y = 2*x1^2 - 6*x2 + 4.5
 Matrix yTrain = new(new float[,] { { -5.5f }, { -5.5f }, { -1.5f }, { 6.5f }, { 18.5f }, { 4.5f }, { 48.5f }, { -10.5f }, { -29.5f }, { 22.5f }, { 22.5f }, { 12.5f }, { 11 }, { 6.5f }, { 12.5f }, { -11.5f }, { 16.5f } });
 
 (Matrix weights1, Matrix weights2, Matrix bias1, float bias2, float loss) = Train(xTrain, yTrain, 4, iterations: 39_500, learningRate: 0.0015f, batchSize: 100);
@@ -56,7 +56,7 @@ Console.ReadLine();
 // n1 - input multiplied by weights1 plus bias1
 // o1 - result of the activation function applied to (input multiplied by weights1 plus bias1)
 // m2 - result of o1 (result of the activation function from the first layer) multiplied by weights2
-static (Matrix xBatch, Matrix yBatch, Matrix m1, Matrix n1, Matrix o1, Matrix m2, Matrix p, float loss) ForwardLoss(Matrix xBatch, Matrix yBatch, Matrix weights1, Matrix weights2, Matrix bias1, float bias2)
+static (Matrix m1, Matrix n1, Matrix o1, Matrix m2, Matrix p, float loss) ForwardLoss(Matrix xBatch, Matrix yBatch, Matrix weights1, Matrix weights2, Matrix bias1, float bias2)
 {
     Debug.Assert(xBatch.GetDimension(Dimension.Rows) == yBatch.GetDimension(Dimension.Rows));
     Debug.Assert(xBatch.GetDimension(Dimension.Columns) == weights1.GetDimension(Dimension.Rows));
@@ -72,7 +72,7 @@ static (Matrix xBatch, Matrix yBatch, Matrix m1, Matrix n1, Matrix o1, Matrix m2
 
     float loss = yBatch.Subtract(p).Power(2).Mean();
 
-    return (xBatch, yBatch, m1, n1, o1, m2, p, loss);
+    return (m1, n1, o1, m2, p, loss);
 }
 
 static Matrix GetPrediction(Matrix x, Matrix weights1, Matrix weights2, Matrix bias1, float bias2) 
@@ -113,7 +113,7 @@ static (Matrix weights1LossGradient, Matrix weights2LossGradient, Matrix bias1Lo
     Matrix dLdN1 = dLdO1.MultiplyElementwise(dO1dN1);
     Matrix dN1dBias1 = Matrix.Ones(bias1);
     Matrix dN1dM1 = Matrix.Ones(m1);
-    Matrix dLdBias1 = dLdN1.MultiplyRowElementwise(dN1dBias1).SumBy(Dimension.Rows);
+    Matrix dLdBias1 = dLdN1.MultiplyElementwise(dN1dBias1).SumBy(Dimension.Rows);
     Matrix dLdM1 = dLdN1.MultiplyElementwise(dN1dM1);
     Matrix dM1dW1 = xBatch.Transpose();
     Matrix dLdW1 = dM1dW1.MultiplyDot(dLdM1);
@@ -179,7 +179,7 @@ static (Matrix weights1, Matrix weights2, Matrix bias1, float bias2, float loss)
 
         batchStart += effectiveBatchSize;
 
-        (xBatch, yBatch, Matrix m1, Matrix n1, Matrix o1, Matrix m2, Matrix p, loss) = ForwardLoss(xBatch, yBatch, weights1, weights2, bias1, bias2);
+        (Matrix m1, Matrix n1, Matrix o1, Matrix m2, Matrix p, loss) = ForwardLoss(xBatch, yBatch, weights1, weights2, bias1, bias2);
 
         // Print loss every 100 steps
         if (i % 100 == 0)
