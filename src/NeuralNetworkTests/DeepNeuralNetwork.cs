@@ -47,7 +47,7 @@ internal class DeepNeuralNetwork
         float loss = neuralNetwork.LastLoss;
 
         Console.WriteLine();
-        Console.WriteLine($"parameters: {@params.Sum(p => p.Array.Length)}");
+        Console.WriteLine($"parameters: {neuralNetwork.ParameterCount}");
         Console.WriteLine($"weights1: \n{weights1}");
         Console.WriteLine($"bias1: \n{bias1}");
         Console.WriteLine($"weights2: \n{weights2}");
