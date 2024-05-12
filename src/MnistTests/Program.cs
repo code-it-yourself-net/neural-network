@@ -13,12 +13,30 @@ using MachineLearning.NeuralNetwork.Operations;
 using MachineLearning.NeuralNetwork.Optimizers;
 using MachineLearning.NeuralNetwork.ParamInitializers;
 
+using Microsoft.Extensions.Logging;
+
+using Serilog;
+
 namespace MnistTests;
 
 internal class Program
 {
     private static void Main(string[] args)
     {
+        // Create ILogger using Serilog
+        Serilog.Core.Logger serilog = new LoggerConfiguration()
+            .WriteTo.File("..\\..\\..\\Logs\\log-.txt", rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+
+        Log.Logger = serilog;
+        Log.Information("Logging started...");
+
+        // Create a LoggerFactory and add Serilog
+        ILoggerFactory loggerFactory = new LoggerFactory()
+            .AddSerilog(serilog);
+
+        ILogger<Trainer> logger = loggerFactory.CreateLogger<Trainer>();
+
         Matrix train = Matrix.LoadCsv(".\\Data\\mnist_train_small.csv");
         Matrix test = Matrix.LoadCsv(".\\Data\\mnist_test.csv");
 
@@ -50,22 +68,24 @@ internal class Program
 
         SimpleDataSource dataSource = new(xTrain, yTrain, xTest, yTest);
 
+        // RangeInitializer initializer = new(-1f, 1f);
+        RandomInitializer initializer = new(12345);
+
         // Define the network.
         NeuralNetwork model = new(
             layers: [
-                new DenseLayer(89, new Tanh(), new RandomInitializer(12345)),
+                new DenseLayer(89, new Tanh(), initializer),
                 // TODO: Try to change Linear to Softmax, and SoftmaxCrossEntropyLoss to CrossEntropyLoss.
-                new DenseLayer(10, new Linear(), new RandomInitializer(12345))
+                new DenseLayer(10, new Linear(), initializer)
             ],
             lossFunction: new SoftmaxCrossEntropyLoss()
         );
 
         Console.WriteLine("\nStart training...\n");
 
-        Trainer trainer = new(model, new StochasticGradientDescent(0.1f))
-        {
-            Memo = "First training"
-        };
+        Trainer trainer = new(model, new StochasticGradientDescentMomentum(0.1f, 0.9f), logger: logger);
+        trainer.Memo = "Logger test";
+
         trainer.Fit(dataSource, EvalFunction, epochs: 10, evalEveryEpochs: 1, batchSize: 100);
 
         Console.ReadLine();
