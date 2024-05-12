@@ -27,8 +27,8 @@ internal class LinearRegression
             lossFunction: new MeanSquaredError()
         );
 
-        Trainer trainer = new(linearRegression, new StochasticGradientDescent(0.00001f));
-        trainer.Fit(dataSource, batchSize: 32, epochs: 1_500, printOnlyEvalEpochs: true);
+        Trainer trainer = new(linearRegression, new StochasticGradientDescent(0.00001f), ConsoleOutputMode.OnlyOnEval);
+        trainer.Fit(dataSource, batchSize: 32, epochs: 1_500, evalEveryEpochs: 100);
 
         Matrix[] @params = linearRegression.GetParams();
         Matrix weights = @params[0];

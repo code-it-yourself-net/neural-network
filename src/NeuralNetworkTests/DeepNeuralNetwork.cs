@@ -34,8 +34,8 @@ internal class DeepNeuralNetwork
             lossFunction: new MeanSquaredError()
         );
 
-        Trainer trainer = new(neuralNetwork, new StochasticGradientDescent(0.002f));
-        trainer.Fit(dataSource, batchSize: 32, epochs: 16_000, evalEveryEpochs: 1_000, printOnlyEvalEpochs: true);
+        Trainer trainer = new(neuralNetwork, new StochasticGradientDescent(0.002f), ConsoleOutputMode.OnlyOnEval);
+        trainer.Fit(dataSource, batchSize: 32, epochs: 16_000, evalEveryEpochs: 1_000);
 
         Matrix[] @params = neuralNetwork.GetParams();
         Matrix weights1 = @params[0];

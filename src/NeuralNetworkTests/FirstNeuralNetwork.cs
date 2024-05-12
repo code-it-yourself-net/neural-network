@@ -20,7 +20,10 @@ internal class FirstNeuralNetwork
         float[,] arguments = new float[,] { { 1, 2 }, { 2, 3 }, { 3, 4 }, { 4, 5 }, { 5, 6 }, { 0, 0 }, { -2, -6 }, { -3, -2 }, { 1, 6 }, { -3, 0 }, { 3, 0 }, { -2, 0 }, { -2.5f, 1 }, { -4, 5 }, { -5, 7 }, { -1, 3 }, { -3, 1 }, { -.5f, 8 }, { -1, 4 }, { .5f, 7 }, { 5, .1f }, { 1, -1 }, { 2, -3 } };
 
         // y = 2 * x1 ^ 2 - 6 * x2 + 4.5
-        FunctionDataSource dataSource = new(arguments, (float[] x) => 2f * x[0] * x[0] - 6f * x[1] + 4.5f, 0);
+        // FunctionDataSource dataSource = new(arguments, (float[] x) => 2f * x[0] * x[0] - 6f * x[1] + 4.5f, 0);
+
+        // y = -(x1 + x2)
+        FunctionDataSource dataSource = new(arguments, (float[] x) => -x[0] - x[1], 0);
 
         //ParamInitializer rangeInitializer = new RangeInitializer(-2f, 2f);
         ParamInitializer randomInitializer = new RandomInitializer();
@@ -33,8 +36,8 @@ internal class FirstNeuralNetwork
             lossFunction: new MeanSquaredError()
         );
 
-        Trainer trainer = new(neuralNetwork, new StochasticGradientDescent(0.002f));
-        trainer.Fit(dataSource, batchSize: 32, epochs: 10_000, evalEveryEpochs: 100, printOnlyEvalEpochs: true);
+        Trainer trainer = new(neuralNetwork, new StochasticGradientDescent(0.002f), ConsoleOutputMode.OnlyOnEval);
+        trainer.Fit(dataSource, batchSize: 32, epochs: 10_000, evalEveryEpochs: 1_000);
 
         Matrix[] @params = neuralNetwork.GetParams();
         Matrix weights1 = @params[0];

@@ -19,8 +19,8 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        Matrix train = Matrix.LoadCsv(".\\data\\mnist_train_small.csv");
-        Matrix test = Matrix.LoadCsv(".\\data\\mnist_test.csv");
+        Matrix train = Matrix.LoadCsv(".\\Data\\mnist_train_small.csv");
+        Matrix test = Matrix.LoadCsv(".\\Data\\mnist_test.csv");
 
         (Matrix xTrain, Matrix yTrain) = Split(train);
         (Matrix xTest, Matrix yTest) = Split(test);
@@ -62,7 +62,10 @@ internal class Program
 
         Console.WriteLine("\nStart training...\n");
 
-        Trainer trainer = new(model, new StochasticGradientDescent(0.1f));
+        Trainer trainer = new(model, new StochasticGradientDescent(0.1f))
+        {
+            Memo = "First training"
+        };
         trainer.Fit(dataSource, EvalFunction, epochs: 10, evalEveryEpochs: 1, batchSize: 100);
 
         Console.ReadLine();
