@@ -17,6 +17,8 @@ using Microsoft.Extensions.Logging;
 
 using Serilog;
 
+using static System.Console;
+
 namespace MnistTests;
 
 internal class Program
@@ -44,27 +46,27 @@ internal class Program
         (Matrix xTest, Matrix yTest) = Split(test);
 
         // Scale xTrain and xTest to mean 0, variance 1
-        Console.WriteLine("Scale data to mean 0...");
+        WriteLine("Scale data to mean 0...");
 
         float mean = xTrain.Mean();
         xTrain.AddInPlace(-mean);
         xTest.AddInPlace(-mean);
 
-        Console.WriteLine($"xTrain min: {xTrain.Min()}");
-        Console.WriteLine($"xTest min: {xTest.Min()}");
-        Console.WriteLine($"xTrain max: {xTrain.Max()}");
-        Console.WriteLine($"xTest max: {xTest.Max()}");
+        WriteLine($"xTrain min: {xTrain.Min()}");
+        WriteLine($"xTest min: {xTest.Min()}");
+        WriteLine($"xTrain max: {xTrain.Max()}");
+        WriteLine($"xTest max: {xTest.Max()}");
 
-        Console.WriteLine("\nScale data to variance 1...");
+        WriteLine("\nScale data to variance 1...");
 
         float std = xTrain.Std();
         xTrain.DivideInPlace(std);
         xTest.DivideInPlace(std);
 
-        Console.WriteLine($"xTrain min: {xTrain.Min()}");
-        Console.WriteLine($"xTest min: {xTest.Min()}");
-        Console.WriteLine($"xTrain max: {xTrain.Max()}");
-        Console.WriteLine($"xTest max: {xTest.Max()}");
+        WriteLine($"xTrain min: {xTrain.Min()}");
+        WriteLine($"xTest min: {xTest.Min()}");
+        WriteLine($"xTrain max: {xTrain.Max()}");
+        WriteLine($"xTest max: {xTest.Max()}");
 
         SimpleDataSource dataSource = new(xTrain, yTrain, xTest, yTest);
 
@@ -81,14 +83,16 @@ internal class Program
             lossFunction: new SoftmaxCrossEntropyLoss()
         );
 
-        Console.WriteLine("\nStart training...\n");
+        WriteLine("\nStart training...\n");
 
-        Trainer trainer = new(model, new StochasticGradientDescentMomentum(0.1f, 0.9f), logger: logger);
-        trainer.Memo = "Logger test";
+        Trainer trainer = new(model, new StochasticGradientDescentMomentum(0.1f, 0.9f), logger: logger)
+        {
+            Memo = "Logger test"
+        };
 
         trainer.Fit(dataSource, EvalFunction, epochs: 10, evalEveryEpochs: 1, batchSize: 100);
 
-        Console.ReadLine();
+        ReadLine();
     }
 
     private static float EvalFunction(NeuralNetwork neuralNetwork, Matrix xEvalTest, Matrix yEvalTest)
