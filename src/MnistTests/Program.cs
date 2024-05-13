@@ -8,6 +8,7 @@ using MachineLearning;
 using MachineLearning.NeuralNetwork;
 using MachineLearning.NeuralNetwork.DataSources;
 using MachineLearning.NeuralNetwork.Layers;
+using MachineLearning.NeuralNetwork.LearningRates;
 using MachineLearning.NeuralNetwork.Losses;
 using MachineLearning.NeuralNetwork.Operations;
 using MachineLearning.NeuralNetwork.Optimizers;
@@ -85,7 +86,8 @@ internal class Program
 
         WriteLine("\nStart training...\n");
 
-        Trainer trainer = new(model, new StochasticGradientDescentMomentum(0.1f, 0.9f), logger: logger)
+        LearningRate learningRate = new ConstantLearningRate(0.1f);
+        Trainer trainer = new(model, new StochasticGradientDescentMomentum(learningRate, 0.9f), logger: logger)
         {
             Memo = "Logger test"
         };

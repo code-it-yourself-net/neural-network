@@ -5,6 +5,7 @@
 using MachineLearning.NeuralNetwork;
 using MachineLearning.NeuralNetwork.DataSources;
 using MachineLearning.NeuralNetwork.Layers;
+using MachineLearning.NeuralNetwork.LearningRates;
 using MachineLearning.NeuralNetwork.Losses;
 using MachineLearning.NeuralNetwork.Operations;
 using MachineLearning.NeuralNetwork.Optimizers;
@@ -50,7 +51,8 @@ try
     // Create an ILogger instance
     ILogger<Trainer> logger = loggerFactory.CreateLogger<Trainer>();
 
-    Trainer trainer = new(neuralNetwork, new StochasticGradientDescent(0.002f), ConsoleOutputMode.Disable, logger)
+    LearningRate learningRate = new ConstantLearningRate(0.002f);
+    Trainer trainer = new(neuralNetwork, new StochasticGradientDescent(learningRate), ConsoleOutputMode.Disable, logger)
     {
         Memo = "Logger test"
     };
