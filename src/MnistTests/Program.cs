@@ -86,10 +86,10 @@ internal class Program
 
         WriteLine("\nStart training...\n");
 
-        LearningRate learningRate = new ConstantLearningRate(0.1f);
+        LearningRate learningRate = new ExponentialDecayLearningRate(0.2f, 0.05f);
         Trainer trainer = new(model, new StochasticGradientDescentMomentum(learningRate, 0.9f), logger: logger)
         {
-            Memo = "Logger test"
+            Memo = "ExponentialDecayLearningRate"
         };
 
         trainer.Fit(dataSource, EvalFunction, epochs: 10, evalEveryEpochs: 1, batchSize: 100);
