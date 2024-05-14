@@ -6,6 +6,7 @@ using MachineLearning;
 using MachineLearning.NeuralNetwork;
 using MachineLearning.NeuralNetwork.DataSources;
 using MachineLearning.NeuralNetwork.Layers;
+using MachineLearning.NeuralNetwork.LearningRates;
 using MachineLearning.NeuralNetwork.Losses;
 using MachineLearning.NeuralNetwork.Operations;
 using MachineLearning.NeuralNetwork.Optimizers;
@@ -36,7 +37,8 @@ internal class FirstNeuralNetwork
             lossFunction: new MeanSquaredError()
         );
 
-        Trainer trainer = new(neuralNetwork, new StochasticGradientDescent(0.002f), ConsoleOutputMode.OnlyOnEval);
+        LearningRate learningRate = new ConstantLearningRate(0.002f);
+        Trainer trainer = new(neuralNetwork, new StochasticGradientDescent(learningRate), ConsoleOutputMode.OnlyOnEval);
         trainer.Fit(dataSource, batchSize: 32, epochs: 10_000, evalEveryEpochs: 1_000);
 
         Matrix[] @params = neuralNetwork.GetParams();
