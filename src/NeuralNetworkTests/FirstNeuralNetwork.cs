@@ -60,7 +60,7 @@ internal class FirstNeuralNetwork
         for (int row = 0; row < xTrain.GetDimension(Dimension.Rows); row++)
         {
             Matrix x = xTrain.GetRow(row);
-            Matrix y = neuralNetwork.Forward(x);
+            Matrix y = neuralNetwork.Forward(x, true);
             Console.WriteLine($"x: {x.Array.GetValue(0, 0)}, {x.Array.GetValue(0, 1)}, p: {y.Array.GetValue(0, 0)}, y: {yTrain.Array.GetValue(row, 0)}");
         }
 
@@ -70,7 +70,7 @@ internal class FirstNeuralNetwork
         for (int row = 0; row < eval.GetDimension(Dimension.Rows); row++)
         {
             Matrix x = eval.GetRow(row);
-            Matrix y = neuralNetwork.Forward(x);
+            Matrix y = neuralNetwork.Forward(x, true);
             Console.WriteLine($"x: {x.Array.GetValue(0, 0)}, {x.Array.GetValue(0, 1)}, p: {y.Array.GetValue(0, 0)}");
         }
 

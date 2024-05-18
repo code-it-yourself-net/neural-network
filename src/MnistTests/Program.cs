@@ -99,7 +99,7 @@ internal class Program
 
     private static float EvalFunction(NeuralNetwork neuralNetwork, Matrix xEvalTest, Matrix yEvalTest)
     {
-        Matrix prediction = neuralNetwork.Forward(xEvalTest);
+        Matrix prediction = neuralNetwork.Forward(xEvalTest, true);
         Matrix predictionArgmax = prediction.Argmax();
 
         int rows = predictionArgmax.Array.GetLength(0);
