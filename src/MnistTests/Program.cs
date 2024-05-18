@@ -70,16 +70,18 @@ internal class Program
         WriteLine($"xTest max: {xTest.Max()}");
 
         SimpleDataSource dataSource = new(xTrain, yTrain, xTest, yTest);
-        SeededRandom commonRandom = new(240514);
+        SeededRandom commonRandom = new(999);
 
         // RangeInitializer initializer = new(-1f, 1f);
         GlorotInitializer initializer = new(commonRandom);
-        Dropout? dropout = null; // new(0.9f, commonRandom);
+        Dropout? dropout1 = new(0.85f, commonRandom);
+        Dropout? dropout2 = new(0.85f, commonRandom);
 
         // Define the network.
         NeuralNetwork model = new(
             layers: [
-                new DenseLayer(89, new Tanh(), initializer, dropout),
+                new DenseLayer(178, new Tanh(), initializer, dropout1),
+                new DenseLayer(46, new Tanh(), initializer, dropout2),
                 // TODO: Try to change Linear to Softmax, and SoftmaxCrossEntropyLoss to CrossEntropyLoss.
                 new DenseLayer(10, new Linear(), initializer)
             ],
