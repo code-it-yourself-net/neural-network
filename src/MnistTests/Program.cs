@@ -89,7 +89,7 @@ internal class Program
         LearningRate learningRate = new ExponentialDecayLearningRate(0.19f, 0.05f);
         Trainer trainer = new(model, new StochasticGradientDescentMomentum(learningRate, 0.9f), logger: logger)
         {
-            Memo = "GlorotInitializer"
+            Memo = "Performance improvement"
         };
 
         trainer.Fit(dataSource, EvalFunction, epochs: 10, evalEveryEpochs: 1, batchSize: 100);
@@ -103,16 +103,19 @@ internal class Program
         Matrix predictionArgmax = prediction.Argmax();
 
         int rows = predictionArgmax.Array.GetLength(0);
+
+#if DEBUG
         if (rows != yEvalTest.GetDimension(Dimension.Rows))
         {
             throw new ArgumentException("Number of samples in prediction and yEvalTest do not match.");
         }
+#endif
 
         int hits = 0;
         for (int row = 0; row < rows; row++)
         {
-            int predictedDigit = Convert.ToInt32(predictionArgmax.Array.GetValue(row, 0));
-            if ((float)yEvalTest.Array.GetValue(row, predictedDigit)! == 1f)
+            int predictedDigit = Convert.ToInt32(predictionArgmax.Array[row, 0]);
+            if (yEvalTest.Array[row, predictedDigit] == 1f)
                 hits++;
         }
 
@@ -131,8 +134,8 @@ internal class Program
         Matrix oneHot = new(yTest.GetDimension(Dimension.Rows), 10);
         for (int row = 0; row < yTest.GetDimension(Dimension.Rows); row++)
         {
-            int value = Convert.ToInt32(yTest.Array.GetValue(row, 0));
-            oneHot.Array.SetValue(1, row, value);
+            int value = Convert.ToInt32(yTest.Array[row, 0]);
+            oneHot.Array[row, value] = 1f;
         }
 
         return (xTest, oneHot);
