@@ -70,14 +70,16 @@ internal class Program
         WriteLine($"xTest max: {xTest.Max()}");
 
         SimpleDataSource dataSource = new(xTrain, yTrain, xTest, yTest);
+        SeededRandom random = new(240518);
 
         // RangeInitializer initializer = new(-1f, 1f);
-        GlorotInitializer initializer = new(240514);
+        GlorotInitializer initializer = new(random);
+        Dropout dropout = new(0.9f, random);
 
         // Define the network.
         NeuralNetwork model = new(
             layers: [
-                new DenseLayer(89, new Tanh(), initializer),
+                new DenseLayer(89, new Tanh(), initializer, dropout),
                 // TODO: Try to change Linear to Softmax, and SoftmaxCrossEntropyLoss to CrossEntropyLoss.
                 new DenseLayer(10, new Linear(), initializer)
             ],
@@ -89,7 +91,7 @@ internal class Program
         LearningRate learningRate = new ExponentialDecayLearningRate(0.19f, 0.05f);
         Trainer trainer = new(model, new StochasticGradientDescentMomentum(learningRate, 0.9f), logger: logger)
         {
-            Memo = "Performance improvement"
+            Memo = "Dropout"
         };
 
         trainer.Fit(dataSource, EvalFunction, epochs: 10, evalEveryEpochs: 1, batchSize: 100);
