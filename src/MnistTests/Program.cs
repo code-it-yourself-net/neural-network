@@ -72,7 +72,7 @@ internal class Program
         SimpleDataSource dataSource = new(xTrain, yTrain, xTest, yTest);
 
         // RangeInitializer initializer = new(-1f, 1f);
-        RandomInitializer initializer = new(12345);
+        GlorotInitializer initializer = new(240514);
 
         // Define the network.
         NeuralNetwork model = new(
@@ -86,10 +86,10 @@ internal class Program
 
         WriteLine("\nStart training...\n");
 
-        LearningRate learningRate = new ExponentialDecayLearningRate(0.2f, 0.05f);
+        LearningRate learningRate = new ExponentialDecayLearningRate(0.19f, 0.05f);
         Trainer trainer = new(model, new StochasticGradientDescentMomentum(learningRate, 0.9f), logger: logger)
         {
-            Memo = "ExponentialDecayLearningRate"
+            Memo = "GlorotInitializer"
         };
 
         trainer.Fit(dataSource, EvalFunction, epochs: 10, evalEveryEpochs: 1, batchSize: 100);
