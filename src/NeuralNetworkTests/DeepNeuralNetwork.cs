@@ -63,7 +63,7 @@ internal class DeepNeuralNetwork
         for (int row = 0; row < xTrain.GetDimension(Dimension.Rows); row++)
         {
             Matrix x = xTrain.GetRow(row);
-            Matrix y = neuralNetwork.Forward(x);
+            Matrix y = neuralNetwork.Forward(x, true);
             Console.WriteLine($"x: {x.Array.GetValue(0, 0)}, {x.Array.GetValue(0, 1)}, p: {y.Array.GetValue(0, 0)}, y: {yTrain.Array.GetValue(row, 0)}");
         }
 
@@ -73,7 +73,7 @@ internal class DeepNeuralNetwork
         for (int row = 0; row < eval.GetDimension(Dimension.Rows); row++)
         {
             Matrix x = eval.GetRow(row);
-            Matrix y = neuralNetwork.Forward(x);
+            Matrix y = neuralNetwork.Forward(x, true);
             Console.WriteLine($"x: {x.Array.GetValue(0, 0)}, {x.Array.GetValue(0, 1)}, p: {y.Array.GetValue(0, 0)}, y: {2f * Math.Pow((float)x.Array.GetValue(0, 0)!, 2f) - 6f * (float)x.Array.GetValue(0, 1)! + 4.5f}");
         }
 

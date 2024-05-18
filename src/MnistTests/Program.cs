@@ -70,14 +70,18 @@ internal class Program
         WriteLine($"xTest max: {xTest.Max()}");
 
         SimpleDataSource dataSource = new(xTrain, yTrain, xTest, yTest);
+        SeededRandom commonRandom = new(999);
 
         // RangeInitializer initializer = new(-1f, 1f);
-        GlorotInitializer initializer = new(240514);
+        GlorotInitializer initializer = new(commonRandom);
+        Dropout? dropout1 = new(0.85f, commonRandom);
+        Dropout? dropout2 = new(0.85f, commonRandom);
 
         // Define the network.
         NeuralNetwork model = new(
             layers: [
-                new DenseLayer(89, new Tanh(), initializer),
+                new DenseLayer(178, new Tanh(), initializer, dropout1),
+                new DenseLayer(46, new Tanh(), initializer, dropout2),
                 // TODO: Try to change Linear to Softmax, and SoftmaxCrossEntropyLoss to CrossEntropyLoss.
                 new DenseLayer(10, new Linear(), initializer)
             ],
@@ -87,9 +91,9 @@ internal class Program
         WriteLine("\nStart training...\n");
 
         LearningRate learningRate = new ExponentialDecayLearningRate(0.19f, 0.05f);
-        Trainer trainer = new(model, new StochasticGradientDescentMomentum(learningRate, 0.9f), logger: logger)
+        Trainer trainer = new(model, new StochasticGradientDescentMomentum(learningRate, 0.9f), random: commonRandom, logger: logger)
         {
-            Memo = "GlorotInitializer"
+            Memo = "Testing different randoms"
         };
 
         trainer.Fit(dataSource, EvalFunction, epochs: 10, evalEveryEpochs: 1, batchSize: 100);
@@ -99,20 +103,23 @@ internal class Program
 
     private static float EvalFunction(NeuralNetwork neuralNetwork, Matrix xEvalTest, Matrix yEvalTest)
     {
-        Matrix prediction = neuralNetwork.Forward(xEvalTest);
+        Matrix prediction = neuralNetwork.Forward(xEvalTest, true);
         Matrix predictionArgmax = prediction.Argmax();
 
         int rows = predictionArgmax.Array.GetLength(0);
+
+#if DEBUG
         if (rows != yEvalTest.GetDimension(Dimension.Rows))
         {
             throw new ArgumentException("Number of samples in prediction and yEvalTest do not match.");
         }
+#endif
 
         int hits = 0;
         for (int row = 0; row < rows; row++)
         {
-            int predictedDigit = Convert.ToInt32(predictionArgmax.Array.GetValue(row, 0));
-            if ((float)yEvalTest.Array.GetValue(row, predictedDigit)! == 1f)
+            int predictedDigit = Convert.ToInt32(predictionArgmax.Array[row, 0]);
+            if (yEvalTest.Array[row, predictedDigit] == 1f)
                 hits++;
         }
 
@@ -131,8 +138,8 @@ internal class Program
         Matrix oneHot = new(yTest.GetDimension(Dimension.Rows), 10);
         for (int row = 0; row < yTest.GetDimension(Dimension.Rows); row++)
         {
-            int value = Convert.ToInt32(yTest.Array.GetValue(row, 0));
-            oneHot.Array.SetValue(1, row, value);
+            int value = Convert.ToInt32(yTest.Array[row, 0]);
+            oneHot.Array[row, value] = 1f;
         }
 
         return (xTest, oneHot);

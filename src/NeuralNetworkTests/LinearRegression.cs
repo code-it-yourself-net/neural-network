@@ -22,9 +22,9 @@ internal class LinearRegression
 
         // y = -(x1 + x2)
         FunctionDataSource dataSource = new(arguments, (float[] x) => -x[0] - x[1], 0);
-
+        SeededRandom random = new(12345);
         NeuralNetwork linearRegression = new(
-            layers: [new DenseLayer(1, new Linear(), new RandomInitializer(12345))],
+            layers: [new DenseLayer(1, new Linear(), new RandomInitializer(random))],
             lossFunction: new MeanSquaredError()
         );
 
