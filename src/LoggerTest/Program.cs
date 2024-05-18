@@ -52,7 +52,7 @@ try
     ILogger<Trainer> logger = loggerFactory.CreateLogger<Trainer>();
 
     LearningRate learningRate = new ConstantLearningRate(0.002f);
-    Trainer trainer = new(neuralNetwork, new StochasticGradientDescent(learningRate), ConsoleOutputMode.Disable, logger)
+    Trainer trainer = new(neuralNetwork, new StochasticGradientDescent(learningRate), ConsoleOutputMode.Disable, null, logger)
     {
         Memo = "Logger test"
     };

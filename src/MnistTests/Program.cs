@@ -70,11 +70,11 @@ internal class Program
         WriteLine($"xTest max: {xTest.Max()}");
 
         SimpleDataSource dataSource = new(xTrain, yTrain, xTest, yTest);
-        SeededRandom random = new(240518);
+        SeededRandom commonRandom = new(240518);
 
         // RangeInitializer initializer = new(-1f, 1f);
-        GlorotInitializer initializer = new(random);
-        Dropout dropout = new(0.9f, random);
+        GlorotInitializer initializer = new(commonRandom);
+        Dropout dropout = new(0.9f, commonRandom);
 
         // Define the network.
         NeuralNetwork model = new(
@@ -89,9 +89,9 @@ internal class Program
         WriteLine("\nStart training...\n");
 
         LearningRate learningRate = new ExponentialDecayLearningRate(0.19f, 0.05f);
-        Trainer trainer = new(model, new StochasticGradientDescentMomentum(learningRate, 0.9f), logger: logger)
+        Trainer trainer = new(model, new StochasticGradientDescentMomentum(learningRate, 0.9f), random: commonRandom, logger: logger)
         {
-            Memo = "Dropout"
+            Memo = "SeededRandom test"
         };
 
         trainer.Fit(dataSource, EvalFunction, epochs: 10, evalEveryEpochs: 1, batchSize: 100);
